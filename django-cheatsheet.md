@@ -190,3 +190,47 @@ urlpatterns = [
 ```
 <a href="{% url 'path_name' any_specific_parameter %}"> </a>
 ```
+
+# Intro to Class Based Views
+## on main_app -> urls.py 
+``` 
+urlpatterns = [  
+        path('', views.home),  
+        path('<path_name>/', views.<path_name>, name='path_name')  
+        path('cats/create/', views.CatCreate.as_view(), name = "cat_create"),
+    ]
+ ```
+ ## on base.html
+ ```
+  <nav>
+            <div class="nav-wrapper purple accent-1">
+                <a class ='left brand-logo' href="/">Cat Collector</a>
+                <ul class="right">
+                    <li >
+                        <a href="{% url 'about' %}">About</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'cats_index' %}">View All Cats</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'cat_create' %}">Add a Cats</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+```
+## main_app --> views.py
+```
+from django.views.generic.edit import CreateView
+#... go below last view function
+
+class CatCreate(CreateView):
+    //override some features
+    model = Cat
+    fields = '_all_' # magic string: adds all the fields to the corresponding model form
+    
+
+```
+## in templates file directory, next to cats folder
+### create a folder called "main_app"
+### touch cat_form.html inside this new folder

@@ -227,10 +227,27 @@ from django.views.generic.edit import CreateView
 class CatCreate(CreateView):
     //override some features
     model = Cat
-    fields = '_all_' # magic string: adds all the fields to the corresponding model form
-    
+    fields = '__all__' # magic string: adds all the fields to the corresponding model form
+    template_name = 'cats/cat_form.html'
 
 ```
 ## in templates file directory, next to cats folder
-### create a folder called "main_app"
-### touch cat_form.html inside this new folder
+### touch cat_form.html inside this folder
+### in the cat_form.html file
+```
+{% extends 'base.html' %}
+{% block title %}
+<title>Add a Cat</title>
+{% endblock %}
+
+{% block content %}
+<h1>Create Cat</h1>
+
+<form action="" method="POST">
+    {{form}}
+    <input type="submit" class="btn" >
+
+</form>
+{% endblock %}
+
+```

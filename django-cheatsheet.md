@@ -20,7 +20,7 @@
 ## In ```urls.py```
 1. import ```include``` from ```django.urls```
 2. within ```urlpatterns``` list add:  
-        ```path('', include(<app_name>)),``` <-- the empty string is the root path
+        ```path('', include(<app_name>.urls)),``` <-- the empty string is the root path
 
 ----
 > ## next: touch ```urls.py``` within <app_name> directory**
@@ -35,7 +35,8 @@
 ```
     urlpatterns = [  
         path('', views.home),  
-        path('<path_name>/', views.<path_name>)  
+        path('<path_name>/', views.<path_name>)
+        path('<path_name/<int:parameter_id>/', views.<parameter_path_name>)  
     ]
 
     # NOTE: django paths NEVER begin with a '/' -- django prepends this
@@ -140,4 +141,52 @@ def <page_name>(request):
     {% else %}
         <p>Price: FREE! </p>
     {% endif %}
+```
+----
+# Defining a Model:
+## in ```models.py```
+```
+class ModelName(models.Model):
+    string_field=models.CharField(max_length=100) # <-- max_length optional
+    int_field=models.IntegerField
+    larger_string=models.TextField
+
+    def __str__(self):
+        return self.name # <-- this is optional to get a friendlier 
+                                response from printing
+```
+----
+# Making Migrations
+## in TERMINAL:
+1. run ```python manage.py migrate``` to connect database
+2. ```python manage.py makemigrations``` to stage models
+3. rerun ```python manage.py migrate``` to complete migration
+----
+# Creating an Admin Acct:
+## in TERMINAL
+1. run ```python manage.py createsuperuser```
+2. create user log in 
+3. go to ```/admin``` to log in
+
+## Connect model to admin
+### in ```admin.py```
+```
+from .models import ModelName
+
+admin.site.register(ModelName)
+```
+Now you can perform CRUD on your data from the admin site
+
+----
+# Preferred Django Method for citing urls:
+## in ```main_app.urls.py```
+```
+urlpatterns = [  
+        path('', views.home),  
+        path('<path_name>/', views.<path_name>, name='path_name')  
+    ]
+```
+## on pages where urls are linked...
+```
+<a href="{% url 'path_name' any_specific_parameter %}"> </a>
 ```

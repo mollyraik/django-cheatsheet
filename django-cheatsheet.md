@@ -190,3 +190,148 @@ urlpatterns = [
 ```
 <a href="{% url 'path_name' any_specific_parameter %}"> </a>
 ```
+
+# Intro to Class Based Views
+## on main_app -> urls.py 
+``` 
+urlpatterns = [  
+        path('', views.home),  
+        path('<path_name>/', views.<path_name>, name='path_name')  
+        path('cats/create/', views.CatCreate.as_view(), name = "cat_create"),
+    ]
+ ```
+ ## on base.html
+ ```
+  <nav>
+            <div class="nav-wrapper purple accent-1">
+                <a class ='left brand-logo' href="/">Cat Collector</a>
+                <ul class="right">
+                    <li >
+                        <a href="{% url 'about' %}">About</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'cats_index' %}">View All Cats</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'cat_create' %}">Add a Cats</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+```
+## main_app --> views.py
+```
+from django.views.generic.edit import CreateView
+#... go below last view function
+
+class CatCreate(CreateView):
+    //override some features
+    model = Cat
+    fields = '__all__' # magic string: adds all the fields to the corresponding model form
+    template_name = 'cats/cat_form.html'
+
+```
+## in templates file directory, next to cats folder
+### touch cat_form.html inside this folder
+### in the cat_form.html file
+```
+{% extends 'base.html' %}
+{% block title %}
+<title>Add a Cat</title>
+{% endblock %}
+
+{% block content %}
+<h1>Create Cat</h1>
+
+<form action="" method="POST">
+    {{form}}
+    
+    <!-- optional: 
+     <table>
+        {{form.as_table}}
+    </table>
+    -->
+    
+    <input type="submit" class="btn" >
+
+</form>
+{% endblock %}
+
+```
+## How to pass info from forms to site, use CSRF tokens
+```
+{% extends 'base.html' %}
+{% block title %}
+<title>Add a Cat</title>
+{% endblock %}
+
+{% block content %}
+<h1>Create Cat</h1>
+
+<form action="" method="POST">
+        {% csrf_token %}
+
+     <table>
+        {{form.as_table}}
+    </table>
+    
+    
+    <input type="submit" class="btn" >
+
+</form>
+{% endblock %}
+
+```
+## Adding a success URL for after creating a cat, go to main_app --> views.py
+```
+  class CatCreate(CreateView):
+    #override some features
+    model = Cat
+    fields = '__all__' # magic string: adds all the fields to the corresponding model form
+    template_name = 'cats/cat_form.html'
+    # add a url for when the submission is successful
+    success_url = '/cats/'
+```
+## Fat models and skinny controllers, main_app/models.py
+```
+#import reverse at top
+from django.urls import reverse
+# at the end of file
+def get_absolute_url(self):
+    return reverse('cats_detail', kwargs={'cat_id': self.id})
+```
+### in main_app/views.py
+```
+# comment out the success_url
+```
+## in urls.py:
+```
+
+path('cats/create/', views.CatCreate.as_view(), name='cats_create'),
+# Add the new routes below
+path('cats/<int:pk>/update/', views.CatUpdate.as_view(), name='cats_update'),
+path('cats/<int:pk>/delete/', views.CatDelete.as_view(), name='cats_delete'),
+```
+
+## update templates/cats/detail.html
+```
+ <div class="card-action">
+        <a href="{% url 'cats_update' cat.id %}">Update</a>
+        <a href="{% url 'cats_delete' cat.id %}">Delete</a>
+      </div>
+      <!-- New markup above -->
+    </div>
+```
+## update main_app/views.py
+```
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+#rest of code
+
+class CatUpdate(UpdateView):
+    model = Cat
+    fields = ('description', 'age') # tuples are preferred over lists for the field attribute
+
+class CatDelete(DeleteView):
+    model = Cat
+    success_url = '/cats/'
+```

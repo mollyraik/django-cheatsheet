@@ -312,3 +312,26 @@ path('cats/create/', views.CatCreate.as_view(), name='cats_create'),
 path('cats/<int:pk>/update/', views.CatUpdate.as_view(), name='cats_update'),
 path('cats/<int:pk>/delete/', views.CatDelete.as_view(), name='cats_delete'),
 ```
+
+## update templates/cats/detail.html
+```
+ <div class="card-action">
+        <a href="{% url 'cats_update' cat.id %}">Update</a>
+        <a href="{% url 'cats_delete' cat.id %}">Delete</a>
+      </div>
+      <!-- New markup above -->
+    </div>
+```
+## update main_app/views.py
+```
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+#rest of code
+
+class CatUpdate(UpdateView):
+    model = Cat
+    fields = ('description', 'age') # tuples are preferred over lists for the field attribute
+
+class CatDelete(DeleteView):
+    model = Cat
+    success_url = '/cats/'
+```

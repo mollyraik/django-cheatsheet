@@ -245,9 +245,70 @@ class CatCreate(CreateView):
 
 <form action="" method="POST">
     {{form}}
+    
+    <!-- optional: 
+     <table>
+        {{form.as_table}}
+    </table>
+    -->
+    
     <input type="submit" class="btn" >
 
 </form>
 {% endblock %}
 
+```
+## How to pass info from forms to site, use CSRF tokens
+```
+{% extends 'base.html' %}
+{% block title %}
+<title>Add a Cat</title>
+{% endblock %}
+
+{% block content %}
+<h1>Create Cat</h1>
+
+<form action="" method="POST">
+        {% csrf_token %}
+
+     <table>
+        {{form.as_table}}
+    </table>
+    
+    
+    <input type="submit" class="btn" >
+
+</form>
+{% endblock %}
+
+```
+## Adding a success URL for after creating a cat, go to main_app --> views.py
+```
+  class CatCreate(CreateView):
+    #override some features
+    model = Cat
+    fields = '__all__' # magic string: adds all the fields to the corresponding model form
+    template_name = 'cats/cat_form.html'
+    # add a url for when the submission is successful
+    success_url = '/cats/'
+```
+## Fat models and skinny controllers, main_app/models.py
+```
+#import reverse at top
+from django.urls import reverse
+# at the end of file
+def get_absolute_url(self):
+    return reverse('cats_detail', kwargs={'cat_id': self.id})
+```
+### in main_app/views.py
+```
+# comment out the success_url
+```
+## in urls.py:
+```
+
+path('cats/create/', views.CatCreate.as_view(), name='cats_create'),
+# Add the new routes below
+path('cats/<int:pk>/update/', views.CatUpdate.as_view(), name='cats_update'),
+path('cats/<int:pk>/delete/', views.CatDelete.as_view(), name='cats_delete'),
 ```
